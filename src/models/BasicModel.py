@@ -7,6 +7,7 @@ Created on Tue Oct 10 16:43:52 2017
 """
 import os
 import tensorflow as tf
+import src.models.ops_util as ops
 import src.utils as utils
 
 
