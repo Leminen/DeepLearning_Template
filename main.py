@@ -1,7 +1,10 @@
 import os
 
 ## GAN Variants
+from src.data import make_dataset
+from src.data import process_dataset
 from src.models.BasicModel import BasicModel
+from src.visualize import visualize
 
 import argparse
 
@@ -16,6 +19,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description=desc)
     
     parser.add_argument('--make_dataset', 
+                        action='store_true', 
+                        help = 'Fetch dataset from remote source into /data/raw. [Defaults to False if argument is omitted]')
+    
+    parser.add_argument('--process_dataset', 
                         action='store_true', 
                         help = 'Run preprocessing of raw data. [Defaults to False if argument is omitted]')
 
@@ -41,6 +48,7 @@ def parse_args():
     parser.add_argument('--dataset', 
                         type=str, default='mnist', 
                         choices=['mnist'],
+                        required = True,
                         help='The name of dataset')
     
 # ----------------------------------------------------------------------------------------------------------------------
@@ -77,7 +85,14 @@ def main():
     
     # Make dataset
     if args.make_dataset:
-        print('Preprossesing Raw Data')
+        print('Fetching raw data')
+        #################################
+        ####### To Be Implemented #######
+        #################################
+        
+    # Make dataset
+    if args.make_dataset:
+        print('Processing raw data')
         #################################
         ####### To Be Implemented #######
         #################################
