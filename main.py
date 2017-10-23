@@ -1,12 +1,25 @@
-import os
+"""
+This file is used to run the project.
+Notes:
+- The structure of this file (and the entire project in general) is made with emphasis on flexibility for research
+purposes, and the pipelining is done in a python file such that newcomers can easily use and understand the code.
+- Remember that relative paths in Python are always relative to the current working directory.
 
-## GAN Variants
+Hence, if you look at the functions in make_dataset.py, the file paths are relative to the path of
+this file (main.py)
+"""
+
+__author__ = "Simon Leminen Madsen"
+__email__ = "slm@eng.au.dk"
+
+import os
+import argparse
+
 from src.data import make_dataset
 from src.data import process_dataset
 from src.models.BasicModel import BasicModel
-from src.visualize import visualize
+from src.visualization import visualize
 
-import argparse
 
 """parsing and configuration"""
 def parse_args():
@@ -20,7 +33,7 @@ def parse_args():
     
     parser.add_argument('--make_dataset', 
                         action='store_true', 
-                        help = 'Fetch dataset from remote source into /data/raw. [Defaults to False if argument is omitted]')
+                        help = 'Fetch dataset from remote source into /data/raw/. Or generate raw dataset [Defaults to False if argument is omitted]')
     
     parser.add_argument('--process_dataset', 
                         action='store_true', 
@@ -66,12 +79,12 @@ def parse_args():
 def check_args(args):
     
     # Assert if training parameters are provided, when training is selected
-    if args.train_model:
-        try:
-            assert args.hparams is ~None
-        except:
-            print('hparams not provided for training')
-            exit()
+#    if args.train_model:
+#        try:
+#            assert args.hparams is ~None
+#        except:
+#            print('hparams not provided for training')
+#            exit()
         
     return args
 
@@ -85,14 +98,13 @@ def main():
     
     # Make dataset
     if args.make_dataset:
-        print('Fetching raw data')
-        #################################
-        ####### To Be Implemented #######
-        #################################
+        print('Fetching raw dataset: ' + args.dataset)
+        make_dataset.make_dataset(args.dataset)
         
     # Make dataset
-    if args.make_dataset:
-        print('Processing raw data')
+    if args.process_dataset:
+        print('Processing raw dataset: ' + args.dataset)
+        process_dataset.process_dataset(args.dataset)
         #################################
         ####### To Be Implemented #######
         #################################
@@ -103,7 +115,7 @@ def main():
         
         if args.model == 'BasicModel':
             model = BasicModel()
-            model.train()
+            model.train(dataset_str = args.dataset, epoch_N = 1, batch_N = 10)
     
     # Visualize results
     if args.visualize:

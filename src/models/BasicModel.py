@@ -7,6 +7,9 @@ Created on Tue Oct 10 16:43:52 2017
 """
 import os
 import tensorflow as tf
+import matplotlib.pyplot as plt
+
+import src.data.process_dataset as process_dataset
 import src.models.ops_util as ops
 import src.utils as utils
 
@@ -54,8 +57,9 @@ class BasicModel(object):
         """
         
         ### Add summaries
-        
-        self.summary_op = tf.summary.merge_all()
+        with tf.name_scope("summaries"):
+            tf.summary.scalar('placeholderScalar', 1) # placeholder summary
+            self.summary_op = tf.summary.merge_all()
         
         
     def train(self, dataset_str, epoch_N, batch_N):
@@ -70,6 +74,7 @@ class BasicModel(object):
         filenames = tf.placeholder(tf.string, shape=[None])
         
         dataset = tf.contrib.data.TFRecordDataset(filenames)
+        dataset = dataset.map(process_dataset._decodeData)      # decoding the tfrecord
         dataset = dataset.shuffle(buffer_size = 10000, seed = None)
         dataset = dataset.batch(batch_size = batch_N)
         iterator = dataset.make_initializable_iterator()
@@ -107,7 +112,7 @@ class BasicModel(object):
             # Do training loops
             for epoch_n in range(epoch_start, epoch_N):
                 
-                training_filenames = ["/data/dataset/file1.tfrecord", "/data/dataset/file2.tfrecord"] # EXAMPLE !
+                training_filenames = ['data/processed/' + dataset_str + '/train.tfrecords'] # EXAMPLE
                 sess.run(iterator.initializer, feed_dict={filenames: training_filenames})
                 
                 while True:
@@ -120,12 +125,17 @@ class BasicModel(object):
                     except tf.errors.OutOfRangeError:
                         break
                 
-                
                 if epoch_n % 1 == 0:
                     saver.save(sess,os.path.join(self.dir_checkpoints, self.model + '.model'), global_step=epoch_n)
-
                 
-            
+                
+                ### TEST of Input
+#                for _ in range(10):
+#                    inputs = sess.run(self.input)
+#                            
+#                    print('Label = ', inputs[0], 'Input Data Shape = ', inputs[1].shape, 'Plotting first image!')
+#                    plt.imshow(inputs[1][0].squeeze())
+#                    plt.show()
             
     
     def predict(self):
