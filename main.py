@@ -18,6 +18,7 @@ import argparse
 from src.data import make_dataset
 from src.data import process_dataset
 from src.models.BasicModel import BasicModel
+from src.models.logreg_example import Logreg_example
 from src.visualization import visualize
 
 
@@ -54,7 +55,7 @@ def parse_args():
     parser.add_argument('--model', 
                         type=str, 
                         default='BasicModel', 
-                        choices=['BasicModel'],
+                        choices=['BasicModel', 'Logreg_example'],
                         required = True,
                         help='The name of the network model')
 
@@ -115,7 +116,11 @@ def main():
         
         if args.model == 'BasicModel':
             model = BasicModel()
-            model.train(dataset_str = args.dataset, epoch_N = 1, batch_N = 10)
+            model.train(dataset_str = args.dataset)
+            
+        elif args.model == 'Logreg_example':
+            model = Logreg_example()
+            model.train(dataset_str = args.dataset, epoch_N = 30, batch_N = 128)
     
     # Visualize results
     if args.visualize:
