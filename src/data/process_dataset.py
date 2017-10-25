@@ -70,13 +70,14 @@ def _decodeData(example_proto):
                 'image_raw' : tf.FixedLenFeature([], tf.string)}
    
     parsed_features = tf.parse_single_example(example_proto, features)
-    
-    label = parsed_features['label']
+
     shape = tf.decode_raw(parsed_features['shape'], tf.int32)
     image = tf.decode_raw(parsed_features['image_raw'], tf.float32)
     image = tf.reshape(image, shape)
+
+    label = parsed_features['label']
     
-    return label, image
+    return image, label
     
     
     

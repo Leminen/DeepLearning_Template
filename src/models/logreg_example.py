@@ -34,7 +34,7 @@ class Logreg_example(object):
         
         ### self.output = f(self.input) ## define f
         
-        X = tf.reshape(self.input[1],[-1,784])
+        X = tf.reshape(self.input_images,[-1,784])
         
         w = tf.Variable(tf.random_normal(shape=[784, 10], stddev=0.01), name='weights')
         b = tf.Variable(tf.zeros([1, 10]), name="bias")
@@ -50,7 +50,7 @@ class Logreg_example(object):
         """
         ### self.loss = f(self.output, self.input) ## define f
         
-        Y = tf.one_hot(self.input[0], depth = 10)
+        Y = tf.one_hot(self.input_labels, depth = 10)
         
         entropy = tf.nn.softmax_cross_entropy_with_logits(logits=self.output, labels=Y, name='loss')
         self.loss = tf.reduce_mean(entropy) # computes the mean over all the examples in the batch
@@ -93,7 +93,7 @@ class Logreg_example(object):
         dataset = dataset.shuffle(buffer_size = 10000, seed = None)
         dataset = dataset.batch(batch_size = batch_N)
         iterator = dataset.make_initializable_iterator()
-        self.input = iterator.get_next()
+        self.input_images, self.input_labels = iterator.get_next()
         
         print('Dataset output shape: ', dataset.output_shapes, 'Dataset output types: ',dataset.output_types)
         
@@ -132,6 +132,7 @@ class Logreg_example(object):
                 training_filenames = ['data/processed/' + dataset_str + '/train.tfrecords'] # EXAMPLE
                 sess.run(iterator.initializer, feed_dict={filenames: training_filenames})
                 
+                print('Running training epoch no: ', epoch_n)
                 while True:
                     try:
                         _, summary = sess.run([self.optimizer_op, self.summary_op])
@@ -148,10 +149,10 @@ class Logreg_example(object):
                 
                 ### TEST of Input
 #                for _ in range(10):
-#                    inputs = sess.run(self.input)
+#                    input_imgs, input_lbls = sess.run(self.input_images, self.input_labels)
 #                            
-#                    print('Label = ', inputs[0], 'Input Data Shape = ', inputs[1].shape, 'Plotting first image!')
-#                    plt.imshow(inputs[1][0].squeeze())
+#                    print('Label = ', input_lbls, 'Input Data Shape = ', input_imgs.shape, 'Plotting first image!')
+#                    plt.imshow(input_imgs[0].squeeze())
 #                    plt.show()
             
     
