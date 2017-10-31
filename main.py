@@ -99,20 +99,24 @@ def main():
     
     # Make dataset
     if args.make_dataset:
+        print('______________________________________________________________')
         print('Fetching raw dataset: ' + args.dataset)
+        print('--------------------------------------------------------------')
         make_dataset.make_dataset(args.dataset)
         
     # Make dataset
     if args.process_dataset:
+        print('______________________________________________________________')
         print('Processing raw dataset: ' + args.dataset)
+        print('--------------------------------------------------------------')
         process_dataset.process_dataset(args.dataset)
-        #################################
-        ####### To Be Implemented #######
-        #################################
+
         
     # Build and train model
     if args.train_model:
+        print('______________________________________________________________')
         print('Configuring and training Network: '+ args.model)
+        print('--------------------------------------------------------------')
         
         if args.model == 'BasicModel':
             model = BasicModel()
