@@ -14,11 +14,12 @@ __email__ = "slm@eng.au.dk"
 
 import os
 import argparse
+import datetime
 
-from src.data import make_dataset
-from src.data import process_dataset
+import src.utils as utils
+from src.data import dataset_manager
 from src.models.BasicModel import BasicModel
-from src.models.logreg_example import Logreg_example
+from src.models.logreg_example import logreg_example
 from src.visualization import visualize
 
 
@@ -55,23 +56,31 @@ def parse_args():
     parser.add_argument('--model', 
                         type=str, 
                         default='BasicModel', 
-                        choices=['BasicModel', 'Logreg_example'],
+                        choices=['BasicModel', 'LogReg_example'],
                         required = True,
                         help='The name of the network model')
 
     parser.add_argument('--dataset', 
-                        type=str, default='mnist', 
-                        choices=['mnist'],
+                        type=str, default='MNIST', 
+                        choices=['MNIST'],
                         required = True,
                         help='The name of dataset')
+    
+    parser.add_argument('--epoch_max', 
+                        type=int, default='20', 
+                        help='The name of dataset')
+
+    parser.add_argument('--batch_size', 
+                        type=int, default='32', 
+                        help='The name of dataset')    
     
 # ----------------------------------------------------------------------------------------------------------------------
 # Define the arguments for the training
 # ----------------------------------------------------------------------------------------------------------------------
 
     parser.add_argument('--hparams',
-                        type=str,
-                        help='Comma separated list of "name=value" pairs.')
+                        type=str, default = '',
+                        help='CLI arguments for the model wrapped in a string')
 
 
     return check_args(parser.parse_args())
@@ -99,32 +108,26 @@ def main():
     
     # Make dataset
     if args.make_dataset:
-        print('______________________________________________________________')
-        print('Fetching raw dataset: ' + args.dataset)
-        print('--------------------------------------------------------------')
-        make_dataset.make_dataset(args.dataset)
+        utils.show_message('Fetching raw dataset: {0}'.format(args.dataset), lvl = 1)
+        dataset_manager.make_dataset(args.dataset)
         
     # Make dataset
     if args.process_dataset:
-        print('______________________________________________________________')
-        print('Processing raw dataset: ' + args.dataset)
-        print('--------------------------------------------------------------')
-        process_dataset.process_dataset(args.dataset)
+        utils.show_message('Processing raw dataset: {0}'.format(args.dataset), lvl = 1)
+        dataset_manager.process_dataset(args.dataset)
 
         
     # Build and train model
     if args.train_model:
-        print('______________________________________________________________')
-        print('Configuring and training Network: '+ args.model)
-        print('--------------------------------------------------------------')
+        utils.show_message('Configuring and Training Network: {0}'.format(args.model), lvl = 1)
         
         if args.model == 'BasicModel':
-            model = BasicModel()
-            model.train(dataset_str = args.dataset)
+            model = BasicModel(dataset = args.dataset, hparams_string = args.hparams)
+            model.train(epoch_max = args.epoch_max, batch_size = args.batch_size)
             
-        elif args.model == 'Logreg_example':
-            model = Logreg_example()
-            model.train(dataset_str = args.dataset, epoch_N = 30, batch_N = 128)
+        elif args.model == 'LogReg_example':
+            model = logreg_example(dataset = args.dataset, hparams_string = args.hparams)
+            model.train(epoch_max = args.epoch_max, batch_size = args.batch_size)
     
     # Visualize results
     if args.visualize:

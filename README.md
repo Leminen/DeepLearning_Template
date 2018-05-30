@@ -35,12 +35,14 @@ Project Organization
     │   ├── __init__.py    <- Makes src a Python module
     │   │
     │   ├── data           <- Scripts to download, generate and/or process the dataset
-    │   │   ├── process_dataset.py
-    │   │   └── make_dataset.py
+    │   │   ├── datasets   <- Scripts for processing and formating specific datasets
+    │   │   │   └── mnist.py
+    │   │   └── dataset_manager.py
     │   │
     │   ├── models         <- Scripts to train models and then use trained models to make
     │   │   │                 predictions
-    │   │   └── BasicModel.py
+    │   │   ├── BasicModel.py
+    │   │   └── logreg_example.py
     │   │
     │   └── visualization  <- Scripts to create exploratory and results oriented visualizations
     │       └── visualize.py
