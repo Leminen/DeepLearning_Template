@@ -44,7 +44,11 @@ def parse_args():
     parser.add_argument('--train_model', 
                         action='store_true', 
                         help = 'Run configuration and training network [Defaults to False if argument is omitted]')
-
+    
+    parser.add_argument('--evaluate_model', 
+                        action='store_true', 
+                        help = 'Run evaluation of the model by computing and visualizing the results [Defaults to False if argument is omitted]')
+    
     parser.add_argument('--visualize', 
                         action='store_true', 
                         help = 'Run visualization of results [Defaults to False if argument is omitted]')
@@ -56,32 +60,31 @@ def parse_args():
     parser.add_argument('--model', 
                         type=str, 
                         default='BasicModel', 
-                        choices=['BasicModel', 'LogReg_example'],
-                        required = True,
+                        choices=['BasicModel',
+                                 'LogReg_example'],
+                        #required = True,
                         help='The name of the network model')
 
     parser.add_argument('--dataset', 
                         type=str, default='MNIST', 
-                        choices=['MNIST'],
-                        required = True,
-                        help='The name of dataset')
-    
-    parser.add_argument('--epoch_max', 
-                        type=int, default='20', 
-                        help='The name of dataset')
-
-    parser.add_argument('--batch_size', 
-                        type=int, default='32', 
-                        help='The name of dataset')    
+                        choices=['MNIST',
+                                 'PSD_Nonsegmented',
+                                 'PSD_Segmented'],
+                        #required = True,
+                        help='The name of dataset')  
     
 # ----------------------------------------------------------------------------------------------------------------------
 # Define the arguments for the training
 # ----------------------------------------------------------------------------------------------------------------------
 
+    parser.add_argument('--id',
+                        type= str,
+                        default = None,
+                        help = 'Optional ID, to distinguise experiments')
+
     parser.add_argument('--hparams',
                         type=str, default = '',
                         help='CLI arguments for the model wrapped in a string')
-
 
     return check_args(parser.parse_args())
 
@@ -122,13 +125,35 @@ def main():
         utils.show_message('Configuring and Training Network: {0}'.format(args.model), lvl = 1)
         
         if args.model == 'BasicModel':
-            model = BasicModel(dataset = args.dataset, hparams_string = args.hparams)
-            model.train(epoch_max = args.epoch_max, batch_size = args.batch_size)
-            
+            model = BasicModel(
+                dataset = args.dataset,
+                id = args.id)
+            model.train(hparams_string = args.hparams)
+
         elif args.model == 'LogReg_example':
-            model = logreg_example(dataset = args.dataset, hparams_string = args.hparams)
-            model.train(epoch_max = args.epoch_max, batch_size = args.batch_size)
+            model = logreg_example(
+                dataset = args.dataset,
+                id = args.id)
+            model.train(hparams_string = args.hparams)
     
+
+    # Evaluate model
+    if args.evaluate_model:
+        utils.show_message('Evaluating Network: {0}'.format(args.model), lvl = 1)
+
+        if args.model == 'BasicModel':
+            model = BasicModel(
+                dataset = args.dataset,
+                id = args.id)
+            model.evaluate(hparams_string = args.hparams)
+
+        elif args.model == 'LogReg_example':
+            model = logreg_example(
+                dataset = args.dataset,
+                id = args.id)
+            model.evaluate(hparams_string = args.hparams)
+
+
     # Visualize results
     if args.visualize:
         print('Visualizing Results')

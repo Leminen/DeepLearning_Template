@@ -14,8 +14,11 @@ def make_dataset(dataset):
     if dataset == 'MNIST':
         mnist.download()
 
-    elif dataset == 'PSD':
-        psd.download()
+    elif dataset == 'PSD_Nonsegmented': 
+        psd.download('Nonsegmented')
+
+    elif dataset == 'PSD_Segmented':
+        psd.download('Segmented')
 
     else:
         pass
@@ -27,8 +30,11 @@ def process_dataset(dataset):
     if dataset == 'MNIST':
         mnist.process()
 
-    elif dataset == 'PSD':
-        psd.process()
+    elif dataset == 'PSD_Nonsegmented':
+        psd.process('Nonsegmented')
+
+    elif dataset == 'PSD_Segmented':
+        psd.process('Segmented')
 
     else:
         pass

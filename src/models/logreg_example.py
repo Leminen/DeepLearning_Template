@@ -16,27 +16,41 @@ import src.utils as utils
 import src.data.util_data as util_data
 
 
-def hparams_parser(hparams_string):
+def hparams_parser_train(hparams_string):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--id',
-                        type=str,
-                        default = None,
-                        help = 'Optional ID to distinguise experiments')
+    parser.add_argument('--epoch_max', 
+                        type=int, default='100', 
+                        help='Max number of epochs to run')
+
+    parser.add_argument('--batch_size', 
+                        type=int, default='64', 
+                        help='Number of samples in each batch')
 
     ## add more model parameters to enable configuration from terminal
     
     return parser.parse_args(shlex.split(hparams_string))
 
 
-class logreg_example(object):
-    def __init__(self, dataset, hparams_string):
+def hparams_parser_evaluate(hparams_string):
+    parser = argparse.ArgumentParser()
 
-        args = hparams_parser(hparams_string)
+    parser.add_argument('--epoch_no', 
+                        type=int,
+                        default=None, 
+                        help='Epoch no to reload')
+
+    ## add more model parameters to enable configuration from terminal
+
+    return parser.parse_args(shlex.split(hparams_string))
+
+
+class logreg_example(object):
+    def __init__(self, dataset, id):
 
         self.model = 'logreg_example'
-        if args.id != None:
-            self.model = self.model + '_' + args.id
+        if id != None:
+            self.model = self.model + '_' + id
 
         self.dir_base        = 'models/' + self.model
         self.dir_logs        = self.dir_base + '/logs'
@@ -46,11 +60,6 @@ class logreg_example(object):
         utils.checkfolder(self.dir_checkpoints)
         utils.checkfolder(self.dir_logs)
         utils.checkfolder(self.dir_results)
-
-        # Dumb model configuration (hparams) to txt file
-        dir_configuration = self.dir_base + '/configuration.txt'
-        with open(dir_configuration, "w") as text_file:
-            print(str(args), file=text_file)
 
         # Specify valid dataset for model
         if dataset == 'MNIST':
@@ -111,12 +120,17 @@ class logreg_example(object):
         return summary_op
         
         
-    def train(self, epoch_max, batch_size):
+    def train(self, hparams_string):
         """ Run training of the network
         Args:
     
         Returns:
         """
+        args_train = hparams_parser_train(hparams_string)
+        batch_size = args_train.batch_size
+        epoch_max = args_train.epoch_max
+
+        utils.save_model_configuration(args_train, self.dir_base)
         
         # Use dataset for loading in datasamples from .tfrecord (https://www.tensorflow.org/programmers_guide/datasets#consuming_tfrecord_data)
         # The iterator will get a new batch from the dataset each time a sess.run() is executed on the graph.
@@ -190,13 +204,15 @@ class logreg_example(object):
                 
             
     
-    def predict(self):
+    def evaluate(self, hparams_string):
         """ Run prediction of the network
         Args:
     
         Returns:
         """
         
+        args_evaluate = hparams_parser_evaluate(hparams_string)
+
         with tf.Session() as sess:
             sess.run(tf.global_variables_initializer())
     
